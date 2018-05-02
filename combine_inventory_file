@@ -1,0 +1,95 @@
+//p416 title 9
+//combine two file maked by inventory.c
+
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define NAME_LEN 25
+
+struct part
+{
+	int number;
+	char name[NAME_LEN + 1];
+	int on_hand;
+}part1,part2;
+
+int num_parts = 0; // number of parts currently	stored
+
+//main: Prompts the user to enter an operation code,
+//      then calls a function to perform the requested
+//      action. Repeats until the user enters the 
+//      command 'q'. Prints an error message if the user
+//      enters an illegal code.
+
+int main(int argc, char *argv[])
+{
+
+	FILE *fp1, *fp2, *goal_fp;
+	int num1, num2;
+	if (argc != 4)
+	{
+		fprintf(stderr, "usage: combine inventory_file1 inventory_file2 goal_file.\n");
+		exit(EXIT_FAILURE);
+	}
+
+	if ((fp1 = fopen(argv[1], "rb")) == NULL)
+	{
+		fprintf(stderr,"Can't open %s.\n",argv[1]);
+		exit(EXIT_FAILURE);
+	}
+
+	if ((fp2 = fopen(argv[2], "rb")) == NULL)
+	{
+		fprintf(stderr, "Can't open %s.\n", argv[2]);
+		exit(EXIT_FAILURE);
+	}
+
+	if ((goal_fp = fopen(argv[3], "wb")) == NULL)
+	{
+		fprintf(stderr, "Can't open %s.\n", argv[3]);
+		exit(EXIT_FAILURE);
+	}
+
+	num1=fread(&part1, sizeof(struct part), 1, fp1);
+	num2=fread(&part2, sizeof(struct part), 1, fp2);
+
+	while ((num1 != 0) & (num2 != 0))
+	{
+		if (part1.number > part2.number)
+		{
+			fwrite(&part2, sizeof(struct part), 1, goal_fp);
+			num2 = fread(&part2, sizeof(struct part), 1, fp2);
+		}
+		else if (part1.number < part2.number)
+		{
+			fwrite(&part1, sizeof(struct part), 1, goal_fp);
+			num1 = fread(&part1, sizeof(struct part), 1, fp1);
+		}
+		else
+		{
+			fwrite(&part1, sizeof(struct part), 1, goal_fp);
+			num1 = fread(&part1, sizeof(struct part), 1, fp1);
+			num2 = fread(&part2, sizeof(struct part), 1, fp2);
+		}
+	}
+
+	while (num1 != 0)
+	{
+		fwrite(&part1, sizeof(struct part), 1, goal_fp);
+		num1 = fread(&part1, sizeof(struct part), 1, fp1);
+	}
+
+	while (num2 != 0)
+	{
+		fwrite(&part2, sizeof(struct part), 1, goal_fp);
+		num2 = fread(&part2, sizeof(struct part), 1, fp1);
+	}
+
+	fclose(fp1);
+	fclose(fp2);
+	fclose(goal_fp);
+
+	return 0;
+}
