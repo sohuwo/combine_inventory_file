@@ -13,7 +13,7 @@ struct part
 	int number;
 	char name[NAME_LEN + 1];
 	int on_hand;
-}part1,part2;
+}part1, part2;
 
 int num_parts = 0; // number of parts currently	stored
 
@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
 
 	if ((fp1 = fopen(argv[1], "rb")) == NULL)
 	{
-		fprintf(stderr,"Can't open %s.\n",argv[1]);
+		fprintf(stderr, "Can't open %s.\n", argv[1]);
 		exit(EXIT_FAILURE);
 	}
 
@@ -52,8 +52,8 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	num1=fread(&part1, sizeof(struct part), 1, fp1);
-	num2=fread(&part2, sizeof(struct part), 1, fp2);
+	num1 = fread(&part1, sizeof(struct part), 1, fp1);
+	num2 = fread(&part2, sizeof(struct part), 1, fp2);
 
 	while ((num1 != 0) & (num2 != 0))
 	{
@@ -69,6 +69,11 @@ int main(int argc, char *argv[])
 		}
 		else
 		{
+			if (strcmp(part1.name, part2.name) != 0)
+			{
+				fprintf(stderr, "The name of Part number %d is different. (%s , %s) Save %s",part1.number,part1.name,part2.name,part1.name);
+			}
+			part1.on_hand += part2.on_hand;
 			fwrite(&part1, sizeof(struct part), 1, goal_fp);
 			num1 = fread(&part1, sizeof(struct part), 1, fp1);
 			num2 = fread(&part2, sizeof(struct part), 1, fp2);
